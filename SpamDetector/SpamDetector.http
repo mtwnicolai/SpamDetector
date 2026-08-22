@@ -1,0 +1,6 @@
+@SpamDetector_HostAddress = http://localhost:5181
+
+GET {{SpamDetector_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
