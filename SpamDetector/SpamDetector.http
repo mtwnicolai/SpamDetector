@@ -1,6 +1,19 @@
 @SpamDetector_HostAddress = http://localhost:5181
 
-GET {{SpamDetector_HostAddress}}/weatherforecast/
-Accept: application/json
+POST {{SpamDetector_HostAddress}}/api/Spam/analyze
+Content-Type: application/json
+
+{
+  "subject": "URGENTE VOCÊ GANHOU DINHEIRO",
+  "body": "Clique aqui agora para receber seu prêmio!!!"
+}
 
 ###
+
+POST {{SpamDetector_HostAddress}}/api/Spam/analyze
+Content-Type: application/json
+
+{
+  "subject": "Aula amanhã",
+  "body": "Professor, a aula continua marcada para as 14 horas?"
+}
