@@ -7,12 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="..\..\..\..\..\..\Downloads\spam-data.csv" Link="Data\spam-data.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.11" />
     <PackageReference Include="Microsoft.ML" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Data\spam-data.csv">
+    <None Update="Data\spam-data-backup.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
