@@ -8,26 +8,22 @@ namespace SpamDetector.Services
         private readonly MLContext _mlContext;
         private readonly ITransformer _model;
 
-        public SpamModelService()
+        private readonly DataPreparationService _dataPreparationService;
+
+        public SpamModelService(
+            MLContext mlContext,
+            DataPreparationService dataPreparationService)
         {
             _mlContext = new MLContext(seed: 42);
+            _dataPreparationService = dataPreparationService;
 
             var dataPath = Path.Combine(
                 AppContext.BaseDirectory,
                 "Data",
                 "spam-data.csv"
-                );
+            );
 
-            IDataView data = _mlContext.Data.LoadFromTextFile<SpamData>(
-                dataPath,
-                hasHeader: true,
-                separatorChar: ','
-                );
-
-            var split = _mlContext.Data.TrainTestSplit(
-                data,
-                testFraction: 0.2
-                );
+            var (trainSet, testSet) = _dataPreparationService.PrepareData(dataPath);
 
             var pipeline = _mlContext.Transforms.Text.FeaturizeText(
                     outputColumnName: "Features",
@@ -38,16 +34,28 @@ namespace SpamDetector.Services
                     )
                 );
 
-            _model = pipeline.Fit(split.TrainSet);
+            _model = pipeline.Fit(trainSet);
 
-            var predictions = _model.Transform(split.TestSet);
+            var predictions = _model.Transform(testSet);
 
             var metrics = _mlContext.BinaryClassification.Evaluate(
                 predictions,
                 labelColumnName: nameof(SpamData.label)    
                 );
 
+            Console.WriteLine("Avaliação:");
             Console.WriteLine($"Accuracy: {metrics.Accuracy:P2}");
+            Console.WriteLine($"Precision: {metrics.PositivePrecision:P2}");
+            Console.WriteLine($"Recall: {metrics.PositiveRecall:P2}");
+            Console.WriteLine($"F1 Score: {metrics.F1Score:P2}");
+
+            Console.WriteLine();
+            Console.WriteLine("Matriz de Confusão:");
+            Console.WriteLine($"Verdadeiro Negativo: {metrics.ConfusionMatrix.Counts[0][0]}");
+            Console.WriteLine($"Falso Negativo: {metrics.ConfusionMatrix.Counts[0][1]}");
+            Console.WriteLine($"Falso Positivo: {metrics.ConfusionMatrix.Counts[1][0]}");
+            Console.WriteLine($"Verdadeiro Positivo: {metrics.ConfusionMatrix.Counts[1][1]}");
+
         }
 
         public SpamPrediction Predict(string message)
